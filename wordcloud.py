@@ -1,13 +1,12 @@
-#wordcloud.py
-#Jessica Napolitano jnapolit@conncoll.edu
-#March 25, 2014
-#This creates either a word cloud with a text file the user inputs or with a
+#CREATOR: Jessica Napolitano
+#FUNCTION: This creates either a word cloud with a text file the user inputs or with a
 #file that is defaulted. 
 
 
 from graphics import*
 from random import *
 from time import sleep
+import os.path
 
 
 """This function displays a splash screen of a wordcloud showing the word 'word cloud'
@@ -24,6 +23,39 @@ def splash_screen(win):
         message.setTextColor(color_rgb(randrange(0,255),randrange(0,255),randrange(0,255)))
         message.draw(win)
     sleep(2)
+    
+    win.delete("all")
+
+    r = randrange(0,255)
+    g = randrange(0,255)
+    b = randrange(0,255)    
+    background = Rectangle(Point(0, 0), Point(600, 600))            
+    background.setFill(color_rgb(r,g,b))    
+    background.draw(win)
+    sticker = Image(Point(300,100),'elephantsticker.gif')    
+    sticker.draw(win)
+    instructions = Text(Point(300,300),"""Word Cloud
+
+
+    This application reads in a text file, determines which words
+    are used the most throughout the text, making an attempt to
+    take out words such as 'the', and then displays them on the
+    window with the high frequency words appearing larger
+    and the lower frequency words appearing smaller. This creates
+    a visual representation of the text and allows the user to better
+    understand the key points of the text better""")
+
+    instructions.setFill(color_rgb((r+40)%255,(g+40)%255,(b+40)%255))
+    instructions.setSize(14)
+    instructions.setStyle('bold')
+    instructions.draw(win)
+    continuemsg = Text(Point(300,500),"Click anywhere to continue to the application")
+    continuemsg.setFill('gold')
+    continuemsg.setSize(22)
+    continuemsg.draw(win)
+    
+    pt = win.getMouse()
+    
 
 #_______________________________________________________________________________________________   
 
@@ -40,10 +72,25 @@ def sortFreq(value):
 """This function is what is initiated when the user does not have a specific text file they would like
 to use. It is a simple program with very few words in it. """
 def defaultCloud(win,numWords):
+
+    #check to make sure that the key is valid and that the file name exists
+    #boolen to tell if the user inputted information into the input box
+    havenumWords = False    
+    if numWords.getText().isdigit() != True:
+        return havenumWords
+
+    fileExist = os.path.isfile('default.txt')
+    if fileExist != True:
+        return -1
+    
+    
+    
     #This clears the main menu and draws a button to go back after the word cloud is made
     win.delete('all')
+    menu = Rectangle(Point(240,40),Point(320,20))
+    menu.setFill("pink")
+    menu.draw(win)
     Text(Point(280,30),'Main Menu').draw(win)
-    Rectangle(Point(240,40),Point(320,20)).draw(win)   
     
     #This opens the default file and puts it all into lower case. It then removes the punctuation
     #and splits it at the spaces. 
@@ -147,10 +194,22 @@ def defaultCloud(win,numWords):
 file name input from the user and then opens that specific file. The file I used to test it is also
 in the file that I submitted. It is of a recipe. It is called test.txt."""
 def customCloud(win,numWords,customFile):
+
+    #check to make sure that the key is valid and that the file name exists
+    #boolen to tell if the user inputted information into the input box
+    havenumWords = False    
+    if numWords.getText().isdigit() != True:
+        return havenumWords
+
+    fileExist = os.path.isfile(customFile.getText())
+    if fileExist != True:
+        return -1
     
     win.delete('all')
+    menu = Rectangle(Point(240,40),Point(320,20))
+    menu.setFill("pink")
+    menu.draw(win)
     Text(Point(280,30),'Main Menu').draw(win)
-    Rectangle(Point(240,40),Point(320,20)).draw(win)
 
 
     customFile=customFile.getText()
@@ -279,6 +338,9 @@ def mainMenu(win):
     customFile.setFill('PaleGreen2')
     customFile.draw(win)
 
+    Log = Text(Point(280,525),"")
+    Log.draw(win)
+
     pt=win.getMouse()
 
     #while they are not clicking the exit
@@ -288,7 +350,22 @@ def mainMenu(win):
         #if they click the custom cloud button execute that function
         if ((pt.getX()>=220 and pt.getX()<=340) and\
         (pt.getY()>=335 and pt.getY()<=365)):
-            customCloud(win,numWords,customFile)
+            ErrCode = customCloud(win,numWords,customFile)
+            Log.undraw()
+            
+            #if the key was not valid
+            if ErrCode ==0:                
+                Log = Text(Point(280,525),'The key entered is not valid')
+                Log.setFill('green')
+                Log.setSize(20)
+                Log.draw(win)
+            #if the file did not exist
+            elif ErrCode== -1:
+                Log = Text(Point(280,525),'The filename entered does not exist')
+                Log.setFill('green')
+                Log.setSize(20)
+                Log.draw(win)
+
             pt=win.getMouse()
 
             #if they hit the main menu button then take them back to the beginnning screen
@@ -300,7 +377,22 @@ def mainMenu(win):
         #else if they click the default cloud then run that function   
         elif (pt.getX()>=220 and pt.getX()<=340) and\
         (pt.getY()>=440 and pt.getY()<=475):
-            defaultCloud(win,numWords)
+            ErrCode = defaultCloud(win,numWords)
+            Log.undraw()
+            
+            #if the key was not valid
+            if ErrCode ==0:                
+                Log = Text(Point(280,525),'The key entered is not valid')
+                Log.setFill('green')
+                Log.setSize(20)
+                Log.draw(win)
+            #if the file did not exist
+            elif ErrCode== -1:                
+                Log = Text(Point(280,525),'The filename entered does not exist')
+                Log.setFill('green')
+                Log.setSize(20)
+                Log.draw(win)
+
             pt=win.getMouse()
 
             #if they hit the main menu button then take them back to the beginning screen

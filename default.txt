@@ -1,0 +1,3 @@
+This is the first line but with no period
+at the end of the line
+and here is the third line.
